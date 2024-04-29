@@ -14,13 +14,21 @@ arrTickets=$(curl ${strUrl} | jq -r)
 #int to keep track of the index of the while loop
 intIndex=0
 intTickets=$(echo ${arrTickets}| jq "length")
-while [ "$intIndex" -lt "$intTickets" ]; do
-	if( $strTicketId == $[echo ${arrTickets} | jq -r .[$intIndex].ticketID] ); then
-		strRequestor=$(echo ${arrResults} | jq -r .[$intIndex].requestor)
-		strSubmissionDate=$(echo ${arrResults} | jq -r .[$intIndex].submissionDate)
-		strSoftwarePackages=$(echo ${arrResults} | jq -r .[$intIndex].softwarePackages)
-		strStandardConfig=$(echo ${arrResults} | jq -r .[$intIndex].standardConfig)
-		strStartTime=$(date + "%Y-%M-%D %H:%M:%S") 
+while [ "$intCurrent" -lt "$intTickets" ]; do
+	if( $strTicketId == $[echo ${arrTickets} | jq -r .[$intCurrent].ticketID] ); then
+		strRequestor=$(echo ${arrResults} | jq -r .[$intCurrent].requestor)
+		strSubmissionDate=$(echo ${arrResults} | jq -r .[$intCurrent].submissionDate)
+		strSoftwarePackages=$(echo ${arrResults} | jq -r .[$intCurrent].softwarePackages)
+		strStandardConfig=$(echo ${arrResults} | jq -r .[$intCurrent].standardConfig)
+		strStartTime=$(date + "%Y-%M-%D %H:%M:%S")
+		for config in $(echo ${arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].config); do
+			strConfig=$(echo {$arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].name)
+			strConfig >> configurationLogs/${strTicketId}.log 
+			eval $config
+		done
+		for package in $(echo ${arrTickets} | jq -r .[${intCurrent}].softwarePackages[].install); do
+			
+		done
 	fi
-	(($intIndex++))
+	(($intCurrent++))
 done
