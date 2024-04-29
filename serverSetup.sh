@@ -23,7 +23,8 @@ while [ "$intCurrent" -lt "$intTickets" ]; do
 		strSubmissionDate=$(echo ${arrResults} | jq -r .[$intCurrent].submissionDate)
 		strSoftwarePackages=$(echo ${arrResults} | jq -r .[$intCurrent].softwarePackages)
 		strStandardConfig=$(echo ${arrResults} | jq -r .[$intCurrent].standardConfig)
-		strStartTime=$(date + "%Y-%M-%D %H:%M:%S")
+		strStartTime=$(date + "%Y-%m-%d %H:%M:%S")
+		echo -e "TicketID: $strTicketId\nStart DateTime: $strStartTime\nRequestor: $strRequestor" >> configurationLogs/${strTicketID}.log
 		#sets up each config and sends it  to the log
 		for config in $(echo ${arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].config); do
 			strConfig=$(echo {$arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].name)
