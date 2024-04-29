@@ -13,6 +13,8 @@ arrTickets=$(curl ${strUrl} | jq -r)
 #echo $arrTickets
 #int to keep track of the index of the while loop
 intCurrent=0
+intPackageIter=0
+intConfigIter=0
 intTickets=$(echo ${arrTickets}| jq "length")
 #iterates through the array for the amount of tickets
 while [ "$intCurrent" -lt "$intTickets" ]; do
@@ -24,18 +26,25 @@ while [ "$intCurrent" -lt "$intTickets" ]; do
 		strSoftwarePackages=$(echo ${arrResults} | jq -r .[$intCurrent].softwarePackages)
 		strStandardConfig=$(echo ${arrResults} | jq -r .[$intCurrent].standardConfig)
 		strStartTime=$(date + "%Y-%m-%d %H:%M:%S")
-		echo -e "TicketID: $strTicketId\nStart DateTime: $strStartTime\nRequestor: $strRequestor" >> configurationLogs/${strTicketID}.log
+		echo "TicketID: $strTicketId" >> configurationLogs/${strTicketId}.log 
+		#insert starttime log output
+		echo "Requestor: $strRequestor" >> configurationLogs/${strTicketId}.log
+		echo "External IP Address: $strIP" >> configurationLogs/${strTicketId}.log
+		echo "Hostname: $strHostName" >> configurationLogs/${strTicketId}.log
+		echo "Standard Configuration: strStandardConfig" >> configurationLogs/${strTicketId}.log
 		#sets up each config and sends it  to the log
 		for config in $(echo ${arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].config); do
-			strConfig=$(echo {$arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].name)
-			$strConfig >> configurationLogs/${strTicketId}.log
+			strConfig=$(echo {$arrTickets} | jq -r .[${intCurrent}].additionalConfigs[$intConfigIter].name)
+			echo"additonalConfig - $strConfig" >> configurationLogs/${strTicketId}.log
 			eval $config
 		done
 		#sets up each package and sends it to the log
 		for package in $(echo ${arrTickets} | jq -r .[${intCurrent}].softwarePackages[].install); do
-			strPackage=$(echo ${arrTickets} | jq -r .[${intCurrent}].softwarePackages[].name)
-			$strPackage >> configurationLogs/${strTicketId}.log
+			strPackage=$(echo ${arrTickets} | jq -r .[${intCurrent}].softwarePackages[$intPackageIter].name)
+			echo $strPackage
+			echo "softwarePackage - $strPackage" >> configurationLogs/${strTicketId}.log
 			yes | sudo apt-get install ${package}
+			((intPackageIter++))
 		done
 	fi
 	((intCurrent++))
