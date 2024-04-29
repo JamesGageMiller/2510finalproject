@@ -38,5 +38,5 @@ while [ "$intCurrent" -lt "$intTickets" ]; do
 			yes | sudo apt-get install ${package}
 		done
 	fi
-	(($intCurrent++))
+	((intCurrent++))
 done
