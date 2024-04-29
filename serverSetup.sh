@@ -17,7 +17,7 @@ intTickets=$(echo ${arrTickets}| jq "length")
 #iterates through the array for the amount of tickets
 while [ "$intCurrent" -lt "$intTickets" ]; do
 	#checks each ticket to see if its equal to the inputed id
-	if( $strTicketId == $[echo ${arrTickets} | jq -r .[$intCurrent].ticketID] ); then
+	if [ ${strTicketId} = $(echo ${arrTickets} | jq -r .[${intCurrent}].ticketID) ]; then
 		#grabs all of the desired info from the json array
 		strRequestor=$(echo ${arrResults} | jq -r .[$intCurrent].requestor)
 		strSubmissionDate=$(echo ${arrResults} | jq -r .[$intCurrent].submissionDate)
@@ -28,7 +28,7 @@ while [ "$intCurrent" -lt "$intTickets" ]; do
 		#sets up each config and sends it  to the log
 		for config in $(echo ${arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].config); do
 			strConfig=$(echo {$arrTickets} | jq -r .[${intCurrent}].additionalConfigs[].name)
-			$strConfig >> configurationLogs/${strTicketId}.log 
+			$strConfig >> configurationLogs/${strTicketId}.log
 			eval $config
 		done
 		#sets up each package and sends it to the log
